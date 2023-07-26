@@ -8,7 +8,6 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.metrics import mean_absolute_error
-import get_sql
 
 def correlation(data: pd.DataFrame,
                 base_column: str,
@@ -97,7 +96,7 @@ def choose_best(y: pd.Series,
     result = [0 if _ < 0 else _ for _ in result] if positive_only else result
     return [[name_of_best, _] for _ in result]
 
-def get_predict(data_query: str,
+def get_predict(df: pd.DataFrame,
                 start: str,
                 end: str,
                 frequency: str,
@@ -105,7 +104,6 @@ def get_predict(data_query: str,
                 cols_param: List[str],
                 cols_group: List[str]) -> pd.DataFrame:
     ''' return dataframe with choosen predict'''
-    df = get_sql.get_df(data_query)
     # add columns with zero where is no data
     df = df.pivot(index=cols_param+['periods'],
                   columns=cols_group,
@@ -135,16 +133,3 @@ def get_predict(data_query: str,
                                                                                    x_pred = sub_df[sub_df['input']==False][cols_param]
                                                                                    )).iloc[:, 0].tolist())
     return df
-
-if __name__ == '__main__':
-    query = 'frct_data.sql'
-    corr = correlation(get_sql.get_df(query), 'pcs_shipped', except_columns=['pcs_shipped_promo'])
-    predict = get_predict(data_query= query,
-                          start= pd.to_datetime('today'),
-                          end= '2024-12-31',
-                          frequency= 'week',
-                          cols_fcst= ['pcs_shipped'],
-                          cols_param= ['even_week','year_iso','week'],
-                          cols_group= ['ID_obj', 'ID_C'])
-
-    predict.to_excel('predict.xlsx')

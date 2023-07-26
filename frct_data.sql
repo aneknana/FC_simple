@@ -1,5 +1,5 @@
 select
-    sites.[objID] as [аж]
+    sites.[objID] as [dc]
     ,year(dateadd(day, 26 - datepart(isoww, fs.[date]), fs.[date])) as [year_iso]
     ,datepart(isowk, fs.[date]) as [week]
     ,datediff(d, '2019-12-30', fs.[date])/7 as [periods]
